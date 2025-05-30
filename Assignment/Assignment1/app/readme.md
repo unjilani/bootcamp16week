@@ -22,5 +22,13 @@ logrotate -v /workspaces/bootcamp16week/Assignment/Assignment1/app/config/logrot
 
 # Email notification received when CPU threshold high 
 
+![Diagram](Output/Application_monitoring.png)
+![Diagram](Output/moniroting_dashboard.png)
+![Diagram](Output/Logsrotated.png)
+![Diagram](Output/WellStructure.png)
+![Diagram](Output/dockersps.png)
+
+
+
 
  
