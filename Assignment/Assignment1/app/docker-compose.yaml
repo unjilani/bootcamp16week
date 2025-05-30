@@ -1,0 +1,119 @@
+services:
+  db:
+    image: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: mydb
+    ports:  
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s  # try after 10 seconds
+      timeout: 5s    # wait for 5 seconds
+      retries: 5     # try for 5 times
+    volumes:  
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - monitoring
+
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.flask
+    container_name: monitored-app
+    ports:
+      - "8000:80"
+    networks:
+      - monitoring
+    depends_on: 
+      db:
+        condition: service_healthy
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_NAME: mydb
+
+    volumes:
+      - .:/app
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1024M
+        reservations:
+          cpus: '0.5'      
+          memory: 512M      
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+  monitor:
+    build:
+      context: .
+      dockerfile: Dockerfile.monitor
+    container_name: flask-live-monitor
+    ports:
+      - "8080:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./logs:/var/log
+    environment:
+      - CONTAINER_NAME=monitored-app
+      - MONITOR_MODE=live
+      - CPU_THRESHOLD="40"
+      - MEMORY_THRESHOLD="50"
+      - RESPONSE_TIME_THRESHOLD=1000
+
+    depends_on:
+      - app
+    command: ["sh", "-c", "python3 dashboard.py & ./monitor_container.sh live"]
+    networks:
+      - monitoring
+
+  alert-service:
+    build:
+      context: .
+      dockerfile: Dockerfile.alert
+    container_name: alert-service
+    volumes:
+      - ./logs:/var/log:ro  # Read-only access to log files
+    environment:
+      - CONTAINER_NAME=monitored-app
+      - ALERT_LOG=/var/log/container_alerts.log
+      - AWS_REGION=${AWS_REGION:-ap-south-1}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - SENDER_EMAIL=${SENDER_EMAIL}
+      - RECIPIENT_EMAILS=${RECIPIENT_EMAILS}
+      - CHECK_INTERVAL=${CHECK_INTERVAL:-30}
+      - ALERT_COOLDOWN=${ALERT_COOLDOWN:-300}
+      - BUFFER_TIMEOUT=${BUFFER_TIMEOUT:-60}
+    depends_on:
+      - monitor
+    restart: unless-stopped
+    networks:
+      - monitoring
+
+  stress-generator:
+    build: 
+      context: .
+      dockerfile: Dockerfile.load
+    depends_on:
+      - app
+    environment:
+      - TARGET_URL=http://app
+      - STRESS_LEVEL=high
+      # low, medium, high, extreme, cpu-intensive, memory-intensive
+    networks:
+      - monitoring
+networks:
+  monitoring:
+
+volumes:
+  db_data:

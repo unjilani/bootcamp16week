@@ -1,0 +1,37 @@
+FROM python:3.11-slim
+
+# Install required packages
+RUN apt-get update && apt-get install -y \
+    docker.io \
+    curl \
+    bc \
+    jq \
+    && rm -rf /var/lib/apt/lists/* \
+    logrotate \
+    cron
+
+# Install Flask
+RUN pip install flask
+
+# Create directory for scripts
+WORKDIR /app
+
+# Copy monitoring script and dashboard
+COPY scripts/monitor_container.sh /app/monitor_container.sh
+COPY appconfig/dashboard.py /app/
+
+# Make scripts executable
+RUN chmod +x monitor_container.sh dashboard.py
+
+# Create log directory
+RUN mkdir -p /var/log
+
+# Create logrotate directory
+RUN mkdir -p /etc/logrotate.d/app-logrotate
+
+
+# COPY your logrotate config into the container 
+COPY config/logrotate.conf /etc/logrotate.d/app-logrotate
+
+# Default command - run both dashboard and monitor & logrotate 
+CMD ["sh", "-c", "python3 dashboard.py & ./monitor_container.sh live"]
