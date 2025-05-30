@@ -19,14 +19,23 @@ Monitoring dashboard: http://localhost:8000
 
 logrotate -v /workspaces/bootcamp16week/Assignment/Assignment1/app/config/logrotate.conf
 
+# Docker services 
+![Diagram](Output/dockerps.png)
 
-# Email notification received when CPU threshold high 
-
+# Application monitoring 
 ![Diagram](Output/Application_monitoring.png)
-![Diagram](Output/moniroting_dashboard.png)
+
+# Dashboard Monitoring 
+![Diagram](Output/monitoring_dashboard.png)
+
+# Log rotation 
 ![Diagram](Output/Logsrotated.png)
+
+# Sturctured 
 ![Diagram](Output/WellStructure.png)
-![Diagram](Output/dockersps.png)
+
+# Email notification received 
+![Diagram](Output/email_notification.png)
 
 
 
