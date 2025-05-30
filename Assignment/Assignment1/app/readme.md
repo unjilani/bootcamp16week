@@ -35,7 +35,7 @@ logrotate -v /workspaces/bootcamp16week/Assignment/Assignment1/app/config/logrot
 ![Diagram](Output/WellStructure.png)
 
 # Email notification received 
-![Diagram](Output/email_notification.png)
+![Diagram](Output/notification_email.png)
 
 
 
