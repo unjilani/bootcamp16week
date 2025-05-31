@@ -19,6 +19,9 @@ Monitoring dashboard: http://localhost:8000
 
 logrotate -v /workspaces/bootcamp16week/Assignment/Assignment1/app/config/logrotate.conf
 
+# Flowchart of Monitoring
+![Diagram](Output/Flowchart.png)
+
 # Docker services 
 ![Diagram](Output/dockerps.png)
 
