@@ -15,7 +15,7 @@ Main application: http://localhost:8080
 
 Monitoring dashboard: http://localhost:8000
 
-# Log rotation
+# Log rotation command
 
 logrotate -v /workspaces/bootcamp16week/Assignment/Assignment1/app/config/logrotate.conf
 
@@ -34,7 +34,7 @@ logrotate -v /workspaces/bootcamp16week/Assignment/Assignment1/app/config/logrot
 # Log rotation 
 ![Diagram](Output/Logsrotated.png)
 
-# Sturctured 
+# Dockerfile structuring
 ![Diagram](Output/WellStructure.png)
 
 # Email notification received 
